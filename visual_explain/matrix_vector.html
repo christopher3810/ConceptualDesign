@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>행렬과 선형 변환</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        
+        .definition {
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 1.2em;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .section h2 {
+            color: #667eea;
+            margin-top: 0;
+            font-size: 1.5em;
+        }
+        
+        .matrix-demo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        .canvas-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        canvas {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        
+        .controls {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .matrix-controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        .matrix-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .matrix-input label {
+            font-weight: bold;
+            color: #667eea;
+            width: 30px;
+        }
+        
+        input[type="range"] {
+            flex: 1;
+        }
+        
+        .matrix-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 1.3em;
+            margin: 20px 0;
+        }
+        
+        .examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .example {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .example h3 {
+            color: #667eea;
+            margin-top: 0;
+            text-align: center;
+        }
+        
+        .formula {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+        }
+        
+        .applications {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .app {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .app.math {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+        
+        .app.cs {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+        
+        .app.ml {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+        
+        .vector-example {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .transformation-result {
+            background: #d4edda;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .reset-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 10px;
+        }
+        
+        .reset-btn:hover {
+            background: #5a6fd8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>행렬과 선형 변환</h1>
+            <div class="definition">
+                행렬은 m×n 스칼라 격자(2차원 배열)이며, <strong>선형 변환(linear transformation)</strong>을 좌표로 표현한 것과 동치
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="applications">
+                <div class="app math">
+                    <h3>수학</h3>
+                    <p>선형 변환을 나타내는 구조</p>
+                    <p>x' = Ax</p>
+                </div>
+                <div class="app cs">
+                    <h3>컴퓨터</h3>
+                    <p>2차원 배열</p>
+                    <p>데이터 구조</p>
+                </div>
+                <div class="app ml">
+                    <h3>머신러닝</h3>
+                    <p>학습변수 배열</p>
+                    <p>가중치, 관계 표현</p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>🎯 대화형 선형 변환 시각화</h2>
+                <p>행렬 원소를 조정하여 벡터가 어떻게 변환되는지 관찰해보세요!</p>
+                
+                <div class="matrix-demo">
+                    <div class="canvas-container">
+                        <h3>원본 벡터 (파란색)</h3>
+                        <canvas id="originalCanvas" width="300" height="300"></canvas>
+                        <div class="vector-example">
+                            벡터 x = [<span id="vectorX">2</span>, <span id="vectorY">3</span>]
+                        </div>
+                    </div>
+                    
+                    <div class="canvas-container">
+                        <h3>변환된 벡터 (빨간색)</h3>
+                        <canvas id="transformedCanvas" width="300" height="300"></canvas>
+                        <div class="transformation-result">
+                            x' = [<span id="resultX">5</span>, <span id="resultY">6</span>]
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="matrix-display">
+                    행렬 A = [<span id="a11">1</span> <span id="a12">2</span>]<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span id="a21">3</span> <span id="a22">4</span>]
+                </div>
+                
+                <div class="controls">
+                    <div class="matrix-controls">
+                        <div class="matrix-input">
+                            <label>a₁₁:</label>
+                            <input type="range" id="a11Input" min="-3" max="3" value="1" step="0.1">
+                            <span id="a11Value">1.0</span>
+                        </div>
+                        <div class="matrix-input">
+                            <label>a₁₂:</label>
+                            <input type="range" id="a12Input" min="-3" max="3" value="2" step="0.1">
+                            <span id="a12Value">2.0</span>
+                        </div>
+                        <div class="matrix-input">
+                            <label>a₂₁:</label>
+                            <input type="range" id="a21Input" min="-3" max="3" value="3" step="0.1">
+                            <span id="a21Value">3.0</span>
+                        </div>
+                        <div class="matrix-input">
+                            <label>a₂₂:</label>
+                            <input type="range" id="a22Input" min="-3" max="3" value="4" step="0.1">
+                            <span id="a22Value">4.0</span>
+                        </div>
+                    </div>
+                    <button class="reset-btn" onclick="resetMatrix()">항등행렬로 리셋</button>
+                    <button class="reset-btn" onclick="setRotationMatrix()">회전행렬</button>
+                    <button class="reset-btn" onclick="setScaleMatrix()">스케일행렬</button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>📐 행렬-벡터 곱셈</h2>
+                <div class="highlight">
+                    <strong>핵심:</strong> 행렬과 벡터의 곱셈은 벡터를 새로운 공간으로 변환합니다.
+                </div>
+                
+                <div class="formula">
+                    [1 2] [a]   [1×a + 2×b]   [a + 2b]<br>
+                    [3 4] [b] = [3×a + 4×b] = [3a + 4b]
+                </div>
+                
+                <div class="vector-example">
+                    예시: A = [1 2], x = [2]<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[3 4]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[3]<br><br>
+                    
+                    Ax = [1×2 + 2×3] = [8]<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[3×2 + 4×3]&nbsp;&nbsp;&nbsp;[18]
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>🔄 행렬의 전치 (Transpose)</h2>
+                <p>전치행렬 A^T는 행과 열을 바꾼 행렬입니다.</p>
+                
+                <div class="examples">
+                    <div class="example">
+                        <h3>원본 행렬 A</h3>
+                        <div class="formula">
+                            [1 2 3]<br>
+                            [4 5 6]
+                        </div>
+                        <p>2×3 행렬</p>
+                    </div>
+                    
+                    <div class="example">
+                        <h3>전치행렬 A^T</h3>
+                        <div class="formula">
+                            [1 4]<br>
+                            [2 5]<br>
+                            [3 6]
+                        </div>
+                        <p>3×2 행렬</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>🧠 머신러닝에서의 행렬</h2>
+                <div class="examples">
+                    <div class="example">
+                        <h3>신경망 가중치</h3>
+                        <p>각 시냅스 연결의 강도를 나타내는 학습 변수</p>
+                        <div class="formula">
+                            W = [w₁₁ w₁₂ w₁₃]<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;[w₂₁ w₂₂ w₂₃]
+                        </div>
+                    </div>
+                    
+                    <div class="example">
+                        <h3>데이터 집합</h3>
+                        <p>각 행은 샘플, 각 열은 특성(feature)</p>
+                        <div class="formula">
+                            X = [특성1 특성2 특성3]<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;[샘플1 데이터...]<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;[샘플2 데이터...]
+                        </div>
+                    </div>
+                    
+                    <div class="example">
+                        <h3>변환 과정</h3>
+                        <p>입력 x가 가중치 W를 통해 출력 x'로 변환</p>
+                        <div class="formula">
+                            x' = Wx<br>
+                            (학습을 통해 W가 최적화됨)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>🎨 특별한 변환들</h2>
+                <div class="examples">
+                    <div class="example">
+                        <h3>항등 변환</h3>
+                        <div class="formula">
+                            I = [1 0]<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;[0 1]
+                        </div>
+                        <p>벡터를 그대로 유지</p>
+                    </div>
+                    
+                    <div class="example">
+                        <h3>회전 변환</h3>
+                        <div class="formula">
+                            R = [cos θ -sin θ]<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;[sin θ  cos θ]
+                        </div>
+                        <p>벡터를 θ만큼 회전</p>
+                    </div>
+                    
+                    <div class="example">
+                        <h3>스케일 변환</h3>
+                        <div class="formula">
+                            S = [sx  0]<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;[0  sy]
+                        </div>
+                        <p>x, y 방향으로 크기 조절</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const originalCanvas = document.getElementById('originalCanvas');
+        const transformedCanvas = document.getElementById('transformedCanvas');
+        const originalCtx = originalCanvas.getContext('2d');
+        const transformedCtx = transformedCanvas.getContext('2d');
+        
+        // 행렬 입력 요소들
+        const a11Input = document.getElementById('a11Input');
+        const a12Input = document.getElementById('a12Input');
+        const a21Input = document.getElementById('a21Input');
+        const a22Input = document.getElementById('a22Input');
+        
+        // 값 표시 요소들
+        const a11Value = document.getElementById('a11Value');
+        const a12Value = document.getElementById('a12Value');
+        const a21Value = document.getElementById('a21Value');
+        const a22Value = document.getElementById('a22Value');
+        
+        // 행렬 표시 요소들
+        const a11Display = document.getElementById('a11');
+        const a12Display = document.getElementById('a12');
+        const a21Display = document.getElementById('a21');
+        const a22Display = document.getElementById('a22');
+        
+        // 벡터 표시 요소들
+        const vectorX = document.getElementById('vectorX');
+        const vectorY = document.getElementById('vectorY');
+        const resultX = document.getElementById('resultX');
+        const resultY = document.getElementById('resultY');
+        
+        // 원본 벡터
+        const originalVector = [2, 3];
+        const scale = 40;
+        const centerX = 150;
+        const centerY = 150;
+        
+        function drawGrid(ctx) {
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            
+            // 격자 그리기
+            for (let i = -5; i <= 5; i++) {
+                const x = centerX + i * scale;
+                const y = centerY + i * scale;
+                
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, 300);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(300, y);
+                ctx.stroke();
+            }
+            
+            // 축 그리기
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(300, centerY);
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, 300);
+            ctx.stroke();
+        }
+        
+        function drawVector(ctx, x, y, color, label) {
+            const endX = centerX + x * scale;
+            const endY = centerY - y * scale; // Y축 반전
+            
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+            
+            // 화살표 그리기
+            const angle = Math.atan2(endY - centerY, endX - centerX);
+            const arrowLength = 10;
+            const arrowAngle = Math.PI / 6;
+            
+            ctx.beginPath();
+            ctx.moveTo(endX, endY);
+            ctx.lineTo(endX - arrowLength * Math.cos(angle - arrowAngle), 
+                      endY - arrowLength * Math.sin(angle - arrowAngle));
+            ctx.moveTo(endX, endY);
+            ctx.lineTo(endX - arrowLength * Math.cos(angle + arrowAngle), 
+                      endY - arrowLength * Math.sin(angle + arrowAngle));
+            ctx.stroke();
+            
+            // 라벨
+            ctx.fillStyle = color;
+            ctx.font = '16px Arial';
+            ctx.fillText(label, endX + 10, endY - 10);
+        }
+        
+        function updateVisualization() {
+            const a11 = parseFloat(a11Input.value);
+            const a12 = parseFloat(a12Input.value);
+            const a21 = parseFloat(a21Input.value);
+            const a22 = parseFloat(a22Input.value);
+            
+            // 값 표시 업데이트
+            a11Value.textContent = a11.toFixed(1);
+            a12Value.textContent = a12.toFixed(1);
+            a21Value.textContent = a21.toFixed(1);
+            a22Value.textContent = a22.toFixed(1);
+            
+            a11Display.textContent = a11.toFixed(1);
+            a12Display.textContent = a12.toFixed(1);
+            a21Display.textContent = a21.toFixed(1);
+            a22Display.textContent = a22.toFixed(1);
+            
+            // 행렬-벡터 곱셈
+            const transformedX = a11 * originalVector[0] + a12 * originalVector[1];
+            const transformedY = a21 * originalVector[0] + a22 * originalVector[1];
+            
+            vectorX.textContent = originalVector[0];
+            vectorY.textContent = originalVector[1];
+            resultX.textContent = transformedX.toFixed(1);
+            resultY.textContent = transformedY.toFixed(1);
+            
+            // 원본 벡터 그리기
+            originalCtx.clearRect(0, 0, 300, 300);
+            drawGrid(originalCtx);
+            drawVector(originalCtx, originalVector[0], originalVector[1], '#3498db', 'x');
+            
+            // 변환된 벡터 그리기
+            transformedCtx.clearRect(0, 0, 300, 300);
+            drawGrid(transformedCtx);
+            drawVector(transformedCtx, transformedX, transformedY, '#e74c3c', "x'");
+        }
+        
+        function resetMatrix() {
+            a11Input.value = 1;
+            a12Input.value = 0;
+            a21Input.value = 0;
+            a22Input.value = 1;
+            updateVisualization();
+        }
+        
+        function setRotationMatrix() {
+            const angle = Math.PI / 4; // 45도
+            a11Input.value = Math.cos(angle).toFixed(2);
+            a12Input.value = (-Math.sin(angle)).toFixed(2);
+            a21Input.value = Math.sin(angle).toFixed(2);
+            a22Input.value = Math.cos(angle).toFixed(2);
+            updateVisualization();
+        }
+        
+        function setScaleMatrix() {
+            a11Input.value = 2;
+            a12Input.value = 0;
+            a21Input.value = 0;
+            a22Input.value = 0.5;
+            updateVisualization();
+        }
+        
+        // 이벤트 리스너 등록
+        a11Input.addEventListener('input', updateVisualization);
+        a12Input.addEventListener('input', updateVisualization);
+        a21Input.addEventListener('input', updateVisualization);
+        a22Input.addEventListener('input', updateVisualization);
+        
+        // 초기 시각화
+        updateVisualization();
+    </script>
+</body>
+</html>
