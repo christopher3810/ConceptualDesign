@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>벡터 내적 설명</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        
+        .formula {
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 1.8em;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .section h2 {
+            color: #667eea;
+            margin-top: 0;
+            font-size: 1.5em;
+        }
+        
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        canvas {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .slider-container {
+            margin: 15px 0;
+        }
+        
+        .slider-container label {
+            display: inline-block;
+            width: 100px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        input[type="range"] {
+            width: 200px;
+            margin: 0 10px;
+        }
+        
+        .result {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        
+        .interpretation {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #17a2b8;
+            margin: 20px 0;
+        }
+        
+        .cases {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .case {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .case h3 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>벡터 내적 (Dot Product)</h1>
+            <div class="formula">
+                a · b = |a||b| cos θ
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <h2>🎯 대화형 시각화</h2>
+                <p>슬라이더를 조작하여 벡터의 크기와 각도를 변경해보세요!</p>
+                
+                <div class="controls">
+                    <div class="slider-container">
+                        <label>벡터 a 크기:</label>
+                        <input type="range" id="magnitudeA" min="1" max="5" value="3" step="0.1">
+                        <span id="magnitudeAValue">3.0</span>
+                    </div>
+                    <div class="slider-container">
+                        <label>벡터 b 크기:</label>
+                        <input type="range" id="magnitudeB" min="1" max="5" value="2.5" step="0.1">
+                        <span id="magnitudeBValue">2.5</span>
+                    </div>
+                    <div class="slider-container">
+                        <label>각도 θ:</label>
+                        <input type="range" id="angle" min="0" max="180" value="45" step="5">
+                        <span id="angleValue">45°</span>
+                    </div>
+                </div>
+                
+                <div class="canvas-container">
+                    <canvas id="vectorCanvas" width="600" height="400"></canvas>
+                </div>
+                
+                <div class="result">
+                    <div>내적 결과: <span id="dotProduct">5.30</span></div>
+                    <div>cos θ = <span id="cosValue">0.71</span></div>
+                </div>
+                
+                <div class="interpretation">
+                    <strong>해석:</strong> <span id="interpretation">벡터들이 같은 방향을 향하고 있어 양의 상관관계를 가집니다.</span>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>📐 기하학적 의미</h2>
+                <div class="highlight">
+                    <strong>핵심 개념:</strong> 내적은 한 벡터를 다른 벡터 방향으로 투영했을 때의 길이와 관련이 있습니다.
+                </div>
+                <p>• <strong>b⃗ 방향으로 a⃗의 성분:</strong> |a⃗| cos θ</p>
+                <p>• <strong>a⃗ 방향으로 b⃗의 성분:</strong> |b⃗| cos θ</p>
+                <p>• 투영된 길이와 원래 벡터 크기의 곱이 내적값입니다.</p>
+            </div>
+            
+            <div class="section">
+                <h2>🔄 연관성의 의미</h2>
+                <div class="cases">
+                    <div class="case">
+                        <h3>θ = 0° (같은 방향)</h3>
+                        <p>a · b = |a||b|</p>
+                        <p><strong>최대 연관성</strong></p>
+                        <p>완전히 같은 방향을 향함</p>
+                    </div>
+                    <div class="case">
+                        <h3>θ = 90° (수직)</h3>
+                        <p>a · b = 0</p>
+                        <p><strong>연관성 없음</strong></p>
+                        <p>서로 독립적인 방향</p>
+                    </div>
+                    <div class="case">
+                        <h3>θ = 180° (반대 방향)</h3>
+                        <p>a · b = -|a||b|</p>
+                        <p><strong>최대 반대 연관성</strong></p>
+                        <p>완전히 반대 방향을 향함</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>💡 실생활 응용</h2>
+                <p>• <strong>물리학:</strong> 일(Work) = 힘 · 변위</p>
+                <p>• <strong>머신러닝:</strong> 유사도 측정</p>
+                <p>• <strong>컴퓨터 그래픽스:</strong> 조명 계산</p>
+                <p>• <strong>데이터 분석:</strong> 상관관계 분석</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('vectorCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const magnitudeASlider = document.getElementById('magnitudeA');
+        const magnitudeBSlider = document.getElementById('magnitudeB');
+        const angleSlider = document.getElementById('angle');
+        
+        const magnitudeAValue = document.getElementById('magnitudeAValue');
+        const magnitudeBValue = document.getElementById('magnitudeBValue');
+        const angleValue = document.getElementById('angleValue');
+        
+        const dotProductSpan = document.getElementById('dotProduct');
+        const cosValueSpan = document.getElementById('cosValue');
+        const interpretationSpan = document.getElementById('interpretation');
+        
+        const scale = 50; // 픽셀 단위
+        const originX = canvas.width / 2;
+        const originY = canvas.height / 2;
+        
+        function drawVector(fromX, fromY, toX, toY, color, label, width = 3) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+            
+            // 화살표 그리기
+            const angle = Math.atan2(toY - fromY, toX - fromX);
+            const arrowLength = 15;
+            const arrowAngle = Math.PI / 6;
+            
+            ctx.beginPath();
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - arrowLength * Math.cos(angle - arrowAngle), 
+                      toY - arrowLength * Math.sin(angle - arrowAngle));
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - arrowLength * Math.cos(angle + arrowAngle), 
+                      toY - arrowLength * Math.sin(angle + arrowAngle));
+            ctx.stroke();
+            
+            // 라벨
+            ctx.fillStyle = color;
+            ctx.font = '16px Arial';
+            ctx.fillText(label, toX + 10, toY - 10);
+        }
+        
+        function drawProjection(projX, projY, originalX, originalY, color) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(originalX, originalY);
+            ctx.lineTo(projX, projY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+        
+        function drawArc(centerX, centerY, radius, startAngle, endAngle, color) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+            ctx.stroke();
+        }
+        
+        function updateVisualization() {
+            const magnitudeA = parseFloat(magnitudeASlider.value);
+            const magnitudeB = parseFloat(magnitudeBSlider.value);
+            const angle = parseFloat(angleSlider.value);
+            
+            // 값 표시 업데이트
+            magnitudeAValue.textContent = magnitudeA.toFixed(1);
+            magnitudeBValue.textContent = magnitudeB.toFixed(1);
+            angleValue.textContent = angle + '°';
+            
+            // 각도를 라디안으로 변환
+            const angleRad = angle * Math.PI / 180;
+            
+            // 벡터 끝점 계산
+            const aX = originX + magnitudeA * scale;
+            const aY = originY;
+            const bX = originX + magnitudeB * scale * Math.cos(angleRad);
+            const bY = originY - magnitudeB * scale * Math.sin(angleRad);
+            
+            // 내적 계산
+            const dotProduct = magnitudeA * magnitudeB * Math.cos(angleRad);
+            const cosValue = Math.cos(angleRad);
+            
+            // 캔버스 초기화
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 격자 그리기
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= canvas.width; i += scale) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+            for (let i = 0; i <= canvas.height; i += scale) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
+            
+            // 축 그리기
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, originY);
+            ctx.lineTo(canvas.width, originY);
+            ctx.moveTo(originX, 0);
+            ctx.lineTo(originX, canvas.height);
+            ctx.stroke();
+            
+            // 벡터 그리기
+            drawVector(originX, originY, aX, aY, '#e74c3c', 'a', 4);
+            drawVector(originX, originY, bX, bY, '#3498db', 'b', 4);
+            
+            // 투영 그리기
+            const projectionLength = magnitudeA * Math.cos(angleRad);
+            const projX = originX + projectionLength * scale * Math.cos(angleRad);
+            const projY = originY - projectionLength * scale * Math.sin(angleRad);
+            
+            if (projectionLength > 0) {
+                drawVector(originX, originY, projX, projY, '#27ae60', 'proj', 2);
+                drawProjection(projX, projY, aX, aY, '#95a5a6');
+            }
+            
+            // 각도 표시
+            if (angle > 0 && angle < 180) {
+                drawArc(originX, originY, 40, -angleRad, 0, '#f39c12');
+                ctx.fillStyle = '#f39c12';
+                ctx.font = '14px Arial';
+                ctx.fillText('θ', originX + 50, originY - 10);
+            }
+            
+            // 결과 업데이트
+            dotProductSpan.textContent = dotProduct.toFixed(2);
+            cosValueSpan.textContent = cosValue.toFixed(2);
+            
+            // 해석 업데이트
+            let interpretation;
+            if (cosValue > 0.7) {
+                interpretation = "벡터들이 같은 방향을 향하고 있어 강한 양의 상관관계를 가집니다.";
+            } else if (cosValue > 0.3) {
+                interpretation = "벡터들이 비슷한 방향을 향하고 있어 양의 상관관계를 가집니다.";
+            } else if (cosValue > -0.3) {
+                interpretation = "벡터들이 거의 수직에 가까워 상관관계가 약합니다.";
+            } else if (cosValue > -0.7) {
+                interpretation = "벡터들이 반대 방향을 향하고 있어 음의 상관관계를 가집니다.";
+            } else {
+                interpretation = "벡터들이 완전히 반대 방향을 향하고 있어 강한 음의 상관관계를 가집니다.";
+            }
+            interpretationSpan.textContent = interpretation;
+        }
+        
+        // 이벤트 리스너 등록
+        magnitudeASlider.addEventListener('input', updateVisualization);
+        magnitudeBSlider.addEventListener('input', updateVisualization);
+        angleSlider.addEventListener('input', updateVisualization);
+        
+        // 초기 시각화
+        updateVisualization();
+    </script>
+</body>
+</html>
