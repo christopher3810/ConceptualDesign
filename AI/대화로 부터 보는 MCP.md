@@ -48,6 +48,14 @@ IDE이든 Cloud Desktop이든 에이전트 인터페이스이든 어떤 애플�
   
 단순히 도구만 모델에 연결하는 것 외에도 하고 싶은 일이 많기 때문인데, 서로 다른 기능을 구분할 수 있는 방법이 필요함.  
 
+>[!important]
+>주요 내용
+>- Claude Desktop과 IDE 사이의 반복적인 복사-붙여넣기 작업의 불편함에서 시작
+>- M×N 통합 문제를 해결하기 위한 표준 프로토콜의 필요성 인식
+>- LSP(Language Server Protocol)의 성공 사례에서 영감을 받음
+>- 애플리케이션 개발자 관점에서 설계 시작
+>- 단순한 도구 호출(tool calling)을 넘어서는 더 풍부한 기능 제공 목표
+
 ---
 ### mcp 의 3 가지 primitive type
   
@@ -84,6 +92,14 @@ MCP를 통해 이런 것들이 어떻게 구현될 수 있는지 의견을 표�
 > So like, what are the unique things that they could do to like create the best user experience even while connecting up to this big open ecosystem of integration?  
   
 거대한 오픈 통합 생태계에 연결하면서도 최고의 사용자 경험을 만들기 위해 할 수 있는 고유한 것들이 무엇인가?  
+
+>[!important]
+>주요 내용
+>- **Tools**: 모델이 직접 호출하는 기능들 (모델 주도적)
+>- **Resources**: 데이터/컨텍스트 조각들 (애플리케이션/사용자 제어 가능)
+>- **Prompts**: 사용자가 시작하는 텍스트/명령어 매크로
+>- 각 프리미티브는 애플리케이션 개발자가 자유롭게 구현 방식을 선택 가능
+>- 애플리케이션의 차별화를 위한 유연성 제공
 
 ---  
 ###  **실제 구현 사례**  
@@ -184,6 +200,20 @@ MCP 서버가 문서나 데이터베이스 등을 리소스 세트로 노출하�
 > And so like basically any IDE where you have like an attachment menu that I think naturally models as resources. It’s just, you know, those implementations already existed.  
   
 결국 기존에 존재하던 여러 애플리케이션 기능을 MCP 서버의 리소스로 분리·운영할 수 있다는 점이 핵심입니다.  
+
+>[!important]
+>주요 내용
+>**Tools vs Resources 구분 기준**
+>- Tools: 모델이 자율적으로 판단하여 호출 (예: SQL 쿼리 실행)
+>- Resources: 더 유연한 사용, URI로 식별, 사용자/애플리케이션이 제어 가능
+>
+>**실제 활용 예시**:
+>- Sentry 백트레이스를 프롬프트로 가져오기
+>- Zed 에디터의 프롬프트 라이브러리 자동 채우기
+>- 데이터베이스 스키마를 리소스로 노출
+>
+>기존 애플리케이션 기능을 MCP 프리미티브로 재구성 가능
+
   
 ---  
 #### 도구 호출 , 유연성 또는 제약  
@@ -328,6 +358,20 @@ AI가 발전할수록 사용자들은 외부 시스템 연동을 원할 것이�
 >One more thing to add here is that we've already seen people, I mean, this happened very early. People in the community built like bridges between the two as well. So like, if what you have is an open API specification and no one's, you know, building a custom MCP server for it, there are already like translators that will take that and re-expose it as MCP. And you could do the other direction too. Awesome.  
   
 추가로, 커뮤니티에서는 이미 양방향 변환 브리지를 만든 사례가 있습니다. OpenAPI 사양을 MCP 서버로 중계(translator)하거나, 반대로 MCP 사양을 OpenAPI로 내보내는 도구가 개발되어 있죠.  
+
+>[!important]
+>주요 내용
+>**도구 결과 반환 철학**
+>- 엄격한 스키마보다 유연한 메시지 형태 선호
+>- LLM의 정보 추출 능력을 신뢰
+>- API 원본 데이터를 그대로 전달(passthrough)
+>
+**MCP vs OpenAPI 차이점**:
+>- OpenAPI: 너무 세부적(granular), REST API 중심
+>- MCP: AI 특화 상위 개념, 상태유지(stateful) 설계
+>- 미래 멀티모달 상호작용 대비
+>
+> 커뮤니티에서 양방향 브리지 개발 중
   
 ---  
 ### MCP 서버를 구축하는 것에 대해  
@@ -410,7 +454,8 @@ AI가 발전할수록 사용자들은 외부 시스템 연동을 원할 것이�
 자동 선택(auto-selecting)·자동 설치(auto-installing) 같은 기능까지 더해지면, 더욱 흥미로운 경험이 가능할 겁니다.  
   
 >[!note]  
->자동선택, 설치 확인하기.  
+>auto-selecting, auto-installing 
+>특정 기능이 필요한 시점에 자동으로 mcp 서버를 선택하거나,  mcp 서버를 설치하는것을 의미하는것 같음.
   
 > I, I think practically there are some niceties we still need to add to the SDKs to make this really simple and like easy to execute on like this kind of recursive MCP server that is also a client or like kind of multiplexing together the behaviors of multiple MCP servers into one host, as we call it.  
   
@@ -468,7 +513,27 @@ AI가 발전할수록 사용자들은 외부 시스템 연동을 원할 것이�
 > And so I think the key question, which is still unresolved is like, to what degree are agents really naturally fitting in to this existing model and paradigm or to what degree is it basically just like orthogonal? It should be something.  
   
 따라서 핵심 질문은 “에이전트가 MCP 모델·패러다임에 자연스럽게 녹아드는가?” 아니면 “전혀 별개(orthogonal)로 다뤄야 하는가?” 입니다. 이 부분은 아직 결론이 나지 않았습니다.  
-  
+
+**핵심 요약:**
+
+>[!important]
+>주요 내용
+>**MCP 서버 구축 시작 방법**:
+>- 좋아하는 언어와 SDK 선택
+>- 개인적으로 필요한 기능부터 구현
+>- 30분 안에 간단한 서버 만들어보기
+>- AI를 활용한 코딩 추천
+>
+>**컴포저빌리티(Composability)**:
+>- 서버가 동시에 클라이언트 역할 가능
+>- 재귀적 패턴으로 MCP 서버 체인 구성
+>- DAG 형태의 네트워크 구축 가능
+>
+>**MCP와 에이전트의 관계**:
+>- 아직 명확히 정의되지 않은 영역
+>- MCP가 에이전트 표현 방식이 될 수도 있고
+>- 에이전트 간 통신 계층이 될 수도 있음
+
 ---  
 ### 도구 사용 개수와 제어 권한 관리  
   
@@ -476,10 +541,374 @@ AI가 발전할수록 사용자들은 외부 시스템 연동을 원할 것이�
 >-swyx-  
   
 좋습니다. 좀 더 구체적인 질문으로 넘어가 보죠. 첫 번째는 단순합니다. “하나의 구현에서 얼마나 많은 MCP 서버(또는 도구·리소스·프롬프트 등)를 지원할 수 있느냐?”라는 폭(많이) 대 깊이(적게) 문제입니다.  
-  
->  
-  
-  
+
+>And, and this, this is direct relevance to the nesting of MCPs that we just talked about in April, 2024, when, when Claude was launching one of its first contexts, the first million token context example, they said you can support 250 tools.
+
+그리고 이 질문은 2024년 4월, Claude가 첫 번째 컨텍스트(백만 토큰 맥락) 예시를 발표하며 “250개의 도구를 지원할 수 있다”고 말했던 MCP 중첩(nesting) 문제와 직접적으로 연관됩니다.
+
+>And in a lot of cases, you can't do that.  
+
+하지만 실제로는 그 정도를 지원하지 못하는 경우가 많습니다.
+
+> You know, so to me, that's wide in, in the sense that you, you don't have tools that call tools.  
+
+제게 있어 ‘넓다(wide)’는 의미는, 도구(tool)가 다른 도구를 호출하지 않는다는 뜻입니다.
+
+> You just have the model and a flat hierarchy of tools, but then obviously you have tool confusion.  
+
+ 단순히 모델과 평면적(flat)인 도구 계층(hierarchy)이 있을 뿐인데, 이 경우 도구 간 혼선(confusion)이 발생하기 마련입니다.
+
+> It's going to happen when the tools are adjacent, you call the wrong tool.  
+
+ 도구들이 서로 가까이(adjacent) 있을 때, 잘못된 도구를 호출하는 상황이 발생할 수밖에 없습니다.
+
+> You're going to get the bad results, right?  
+
+그럼 당연히 원하는 결과가 나오지 않겠죠?
+
+> Do you have a recommendation of like a maximum number of MCP servers that are enabled at any given time?  
+
+어떤 시점에 활성화할 MCP 서버의 **최대 개수**에 대해 권장하는 바가 있나요?
+
+ >I think be honest, like, I think there's not one answer to this because to some extent, it depends on the model that you're using.  
+ -Justin/David-
+
+솔직히 말씀드리자면, 이 질문에는 정답이 하나만 있는 게 아닙니다. 어느 정도는 사용 중인 **모델(model)**에 달려 있기 때문이죠.
+
+>[!Note]
+>결국 모델 성능, 모델에서 제공하는 정보, 피쳐에 달려있음.
+
+> I mean, I think that the dream is certainly like you just furnish all this information to the LLM and it can make sense of everything.  
+
+꿈꾸는 이상(ideal)은 이런 모든 정보를 LLM에 제공하면, LLM이 알아서 모든 것을 해석해 주는 것입니다.
+
+> This, this kind of goes back to like the, the future we envision with MCP is like all this information is just brought to the model and it decides what to do with it.  
+
+이것은 MCP의 미래 청사진과도 연결되는데, 모든 정보가 모델에게 제공되고 **모델이 스스로** 처리 방안을 결정하는 구조를 지향한다는 뜻이죠.
+
+> But today the reality or the practicalities might mean that like, yeah, maybe you, maybe in your client application, like the AI application, you do some fill in the blanks.  
+
+그러나 현재 현실적으로는, 클라이언트 애플리케이션(또는 AI 애플리케이션) 쪽에서 **빈칸 보완(fill in the blanks)** 작업을 해야 할 수도 있습니다.
+
+> Maybe you do some filtering over the tool set or like maybe you, you run like a faster, smaller LLM to like filter to what's most relevant and then only pass those tools to the bigger model.  
+
+도구 세트를 **필터링(filtering)** 하거나, 더 빠르고 작은 LLM을 사용해 가장 관련성 높은 도구만 선별한 뒤, 그 도구들만 더 큰 모델에 전달하는 식으로 말이죠.
+
+> Or you could use an MCP server, which is a proxy to other MCP servers and does some filtering at that level or something like that.  
+
+또는 MCP 서버를 **프록시(proxy)** 로 두어, 그 서버에서 다른 MCP 서버들을 필터링하는 단계(routing/filtering)를 구현할 수도 있습니다.
+
+>I think hundreds, as you referenced, is still a fairly safe bet, at least for Claude.  
+
+제가 보기에는, 적어도 Claude의 경우 **수백 단위(hundreds)** 는 여전히 안전한 선택입니다.
+
+#### description and overlap
+
+> Yeah, and obviously it highly, it highly depends on the overlap of the description, right?  
+
+네, 그리고 분명히 **도구 설명(description)의 중복(overlap)** 여부에 크게 달려 있습니다.
+
+> Like if you, if you have like very separate servers that do very separate things and the tools have very clear unique names, very clear, well-written descriptions, you know, your mileage might be more higher than if you have a GitLab and a GitHub server at the same time in your context.  
+
+예컨대, 완전히 분리된 기능을 수행하는 서버들이 있고, 그 도구들의 이름이 명확하게 고유(unique)하며, 설명이 잘 작성되어 있다면, GitLab과 GitHub 같은 유사한 도구를 동시에 둔 경우보다 훨씬 더 성능이 좋을 수 있습니다.
+
+> And, and then the overlap is quite significant because they look very similar to the model and confusion becomes easier.  
+
+반면, 둘의 설명이 많이 겹치면 모델 입장에서 구분이 어려워져 혼선이 더 쉽게 발생하겠죠.
+
+> Depending on the AI application, if you're, if you're trying to build something very agentic, maybe you are trying to minimize the amount of times you need to go back to the user with a question or, you know, minimize the amount of like configurability in your interface or something.  
+
+에이전트형(agentic) 애플리케이션을 만들려면, 사용자에게 되묻는 횟수를 최소화하거나, 인터페이스의 설정(configurability)을 최대한 줄이는 방향으로 설계할 수도 있겠죠.
+
+> But if you're building other applications, you're building an IDE or you're building a chat application or whatever, like, I think it's totally reasonable to have affordances that allow the user to say like, at this moment, I want this feature set or at this different moment, I want this different feature set or something like that.  
+
+반면 IDE나 채팅 애플리케이션을 만든다면, “지금은 이 기능 세트를 쓰고 싶다”, “다른 순간에는 저 기능 세트를 쓰고 싶다”라고 사용자가 직접 선택할 수 있는 **UI 어포던스(affordances)** 를 제공하는 것도 충분히 합리적입니다.
+
+> And maybe not treat it as like always on.  
+
+그리고 항상 모든 기능이 켜진 상태(always-on)로 두지 않아도 될 겁니다.
+
+> The full list always on all the time.  
+
+전체 도구 목록이 항상 활성화된 상태일 필요는 없으니까요.
+
+> I guess the way I think about this is still like at the end of the day, and this is a core MCP design principle is like, ultimately, the concept of a tool is not a tool.  
+
+제 관점은 결국, 그리고 이것이 핵심 MCP 설계 원칙 중 하나인데, “도구(tool)라는 개념 자체가 도구가 아니다”라는 것입니다.
+
+> It's a client application, and by extension, the user.  
+
+즉 도구는 **클라이언트 애플리케이션**이고 확장해서 말하면 결국 **사용자(user)** 인 셈이죠.
+
+> Ultimately, they should be in full control of absolutely everything that's happening via MCP.  
+
+궁극적으로 MCP를 통해 일어나는 모든 일에 대해 사용자가 **완전한 제어(full control)**권을 가져야 합니다.
+
+> When we say that tools are model controlled, what we really mean is like, tools should only be invoked by the model.  
+
+ “도구가 모델에 의해 제어된다(model-controlled)”고 할 때 진짜 의미는 “도구는 오직 모델에 의해서만 호출(invoked)되어야 한다”는 뜻입니다.
+
+> Like there really shouldn't be an application interaction or a user interaction where it's like, okay, as a user, I now want you to use this tool.  
+
+예를 들어 사용자가 “자, 이 도구를 사용해줘”라고 명령하는 **UI 상의 인터랙션**은 없어야 한다는 거죠.
+
+> I mean, occasionally you might do that for prompting reasons, but like, I think that shouldn't be like a UI affordance.  
+
+프롬프트(prompting)를 위해 가끔 그렇게 할 순 있겠지만, 그것이 **일상적인 UI 어포던스**가 되어서는 안 됩니다.
+
+> But I think the client application or the user deciding to like filter out the user, it's not a tool.  
+
+그러나 클라이언트 애플리케이션이나 사용자가 도구 목록에서 특정 항목을 필터링(filter out)하는 것은 도구가 아닙니다.
+
+> I think the client application or the user deciding to like filter out things that MCP servers are offering, totally reasonable, or even like transform them.  
+
+MCP 서버가 제공하는 도구를 **필터링**하거나 **변환(transform)** 하는 것은 전적으로 합리적이라고 봅니다.
+
+> Like you could imagine a client application that takes tool descriptions from an MCP server and like enriches them, makes them better.  
+
+예를 들어 MCP 서버로부터 받아온 도구 설명을 **강화(enrich)** 하여 더 나은 설명으로 바꾸는 애플리케이션을 상상해 볼 수 있겠죠.
+
+> We really want the client applications to have full control in the MCP paradigm.  
+
+우리는 MCP 패러다임 내에서 클라이언트 애플리케이션이 **전권(full control)** 을 갖기를 원합니다.
+
+> That in addition, though, like I think there, one thing that's very, very early in my thinking is there might be a addition to the protocol where you want to give the server author the ability to like logically group certain primitives together, potentially.  
+
+다만 제 초기 구상 중 하나는, 프로토콜에 **서버 저자(author)**가 특정 프리미티브(primitives)를 논리적으로 묶을 수 있는 기능을 추가하는 것입니다.
+
+> To inform that, because they might know some of these logical groupings better, and that could like encompasses prompts, resources, and tools at the same time.  
+
+왜냐하면 서버 저자가 특정 도구 묶음이나 프롬프트, 리소스를 더 잘 이해하고 있을 수 있기 때문입니다.
+
+> I mean, personally, we can have a design discussion on there.  
+
+ 개인적으로는 그 부분에 대해 디자인 논의를 해볼 수 있다고 생각합니다.
+
+> I mean, personally, my take would be that those should be separate MCP servers, and then the user should be able to compose them together.  
+
+제 개인적 의견은, 그런 묶음은 **별도의 MCP 서버**로 두고, 사용자가 그들 간을 **조합(compose)**할 수 있어야 한다는 것입니다.
+
+> Is there going to be like a MCP standard library, so to speak, of like, hey, these are like the canonical servers, do not build this.  
+> -Alessio-
+
+ 일종의 **MCP 표준 라이브러리(standard library)**가 제공되어, “여기 있는 게 공인된(canonical) 서버들이다. 직접 만들 필요 없다”라는 방식이 될까요?
+
+> We're just going to take care of those.  
+
+ 우리가 그 목록을 관리해 주고요.
+
+> And those can be maybe the building blocks that people can compose.  
+
+ 그것들이 사람들이 조합해 쓸 수 있는 **빌딩 블록(building blocks)** 이 될 수 있겠지요.
+
+ >I think we will not be prescriptive in that sense.  
+ >-Justin/David-
+ 
+그 점에 대해서는 우리가 **규격화(prescriptive)** 하지 않을 것입니다.
+
+---
+### 안전하고 믿을만한 구현체를 어떻게 판단 하는가
+
+open source의 특성상 여러개의 구현체가 만들어지고 몇몇 구현체로 수렴하는 구조로 간다면.
+안전하고 믿을만한 구현체를 어떻게 판단할수 있는가?
+
+>Like, how do you determine which MCP servers are like the kind of good and safe ones to use?
+
+어떤 MCP 서버가 “안전하고 믿을 만한 구현체”인지 어떻게 판단할 것인가가 관건입니다.
+
+> But you want to make sure that you're not using ones that are really like sus, right?  
+
+정말 **수상(sus)** 쩍은 구현체를 쓰지 않도록 주의해야 합니다.
+
+> And so trying to think about like how to kind of endow reputation or like, you know, if hypothetically.  
+
+그래서 어떻게 하면 구현체에 **평판(reputation)** 을 부여하거나, 예컨대,
+
+> Anthropic is like, we've vetted this.  
+
+“Anthropic에서 검증(vetted)했다”라는 식의
+
+> It meets our criteria for secure coding or something.  
+
+ “우리의 보안 코딩 기준을 충족한다”라는
+
+> How can that be reflected in kind of this open model where everyone in the ecosystem can benefit?  
+
+ 표준화된 방식으로 반영해서 에코시스템 전체가 혜택을 볼 수 있도록 할 수 있을까요?
+
+> Don't really know the answer yet, but that's very much top of mind.  
+
+아직 정답은 모르겠지만, 현재 이 부분을 가장 중점적으로 고민 중입니다.
+
+> And a registry is very tempting to offer download counts, likes, reviews, and some kind of trust thing.  
+> -swyx-
+ 
+레지스트리는 다운로드 수, 좋아요, 리뷰 같은 **소셜 증명(social proof)**을 제공하기에 매력적인 플랫폼이죠.
+
+> I think it's kind of brittle.  
+
+ 하지만 저는 그 시스템이 **취약(brittle)** 하다고 봅니다.
+
+> Like no matter what kind of social proof or other thing you can, you can offer, the next update can compromise a trusted package.  
+
+어떤 형태의 소셜 증명이라도, 다음 업데이트 때 **신뢰받는 패키지(trusted package)** 가 훼손될 위험이 있기 때문입니다.
+
+>So abusing the trust system is like setting up a trust system creates the damage from the trust system.  
+
+즉, **신뢰 시스템**을 악용(abuse)하면, 신뢰 시스템 자체가 오히려 피해를 낳습니다.
+
+> Yeah, absolutely. Cool.  
+> -Justin/David-
+
+네, 전적으로 동의합니다. 멋지네요.
+
+> And then I think like that's very classic, just supply chain problem that like all registries effectively have.  
+
+ 이것은 사실 모든 레지스트리가 갖는 전형적인 **공급망 문제(supply chain problem)** 이기도 합니다.
+
+---
+### 메모리기능 의 simple 서버 사용 권장
+
+> And I think I really, really encourage people should look at these, what I call special servers.  
+
+제가 **스페셜 서버(special servers)**라고 부르는 것들을 꼭 보시길 적극 권장합니다.
+
+> Like they're, they're not normal servers in the, in the sense that they, they wrap some API and it's just easier to interact with those than to work at the APIs.  
+
+일반 서버가 아니라, **API 래핑(wrap)** 을 통해 API를 직접 다루는 것보다 훨씬 **간편(easier)**하게 상호작용할 수 있는 구조입니다.
+
+> And so I'll, I'll highlight the, the memory one first, just because like, I think there are, there are a few memory startups, but actually you don't need them if you just use this one.  
+
+그래서 먼저 메모리 서버를 강조하고 싶은데, 몇몇 메모리 스타트업이 있지만 이 서버 하나만 써도 충분합니다.
+
+> It's also like 200 lines of code.  
+
+코드 분량도 **약 200줄**로 매우 간단하고요.
+
+> It's super simple.  
+
+정말 단순합니다.
+
+
+>[!important]
+>주요 내용
+>
+ **상태 관리 철학**:
+>- 미래 AI 애플리케이션은 상태유지(stateful) 방향
+>- 운영 복잡도와 균형 필요
+>- Streamable HTTP Transport로 단계적 접근
+  >    
+**세션 관리**:
+>- 세션 재개(resume) 기능 지원
+>- 수평적 확장성 확보
+>- 네트워크 불안정성 대응
+  >  
+**인증 방향성**:
+>- API 키 직접 노출 방지
+>- OAuth 기반 인증 지향
+>- 원격 서버 환경 대비
+
+
+---
+
+### stateless 로 전환
+
+> Stateful to stateless servers.  
+
+상태 유지 서버에서 무상태 서버로의 전환.
+
+> You guys picked SSE as your sort of launch protocol and transport.  
+
+여러분은 처음에 **SSE(Server-Sent Events)** 를 프로토콜 겸 전송 수단으로 선택하셨고요.
+
+> And obviously transport is pluggable.  
+
+그리고 전송 방식은 플러그인처럼 교체 가능하다고요.
+
+> The behind the scenes of that, like was it Jared Palmer's tweet that caused it or were you already working on it?  
+
+ 그 결정의 배경은 무엇인가요? Jared Palmer의 트윗 때문이었나요, 아니면 이미 준비 중이셨나요?
+ 
+ >we have GitHub discussions going back, like, you know, in public going back months, really talking about this, this dilemma and the trade-offs involved.  
+ >-Justin/David-
+
+아니요, 이미 수개월 전부터 GitHub Discussions에서 이 딜레마와 그에 따른 **트레이드오프(trade-offs)**에 대해 활발히 공개 논의를 해 왔습니다.
+
+> You know, we do believe that like.  
+
+저희는 분명히 이렇게 믿고 있습니다.
+
+> The future of AI applications and ecosystem and agents, all of these things I think will be stateful or will be more in the direction of statefulness.  
+
+AI 애플리케이션·에코시스템·에이전트 등 미래의 많은 기술은 **상태 유지(stateful)** 쪽으로 나아갈 것이라고요.
+
+> So we had a lot of.  
+
+그래서 내부적으로도 많은…
+
+> I think honestly, this is one of the most contentious topics we've discussed as like the core MCP team and like gone through multiple iterations on and back and forth.  
+
+솔직히 말해, MCP 핵심 팀 내부에서 **가장 논쟁적(contentious)** 이었던 주제 중 하나로, 여러 차례 반복 논의를 거쳤습니다.
+
+> But ultimately just came back to this conclusion that like if the future looks more stateful, we don't want to move away from that paradigm. Completely.  
+
+하지만 최종 결론은, 미래가 상태 유지 쪽이라면 이 패러다임을 **완전히 포기**하고 싶지 않다는 것이었습니다.
+
+> Now we have to balance that against it's it's been operationally complex or like it's hard to deploy an MCP server if it requires this like long lived persistent connection.  
+
+다만 **운영 난이도(operational complexity)** 를 고려해야 하는데, 장시간 지속 연결(persistent connection)을 요구하는 서버는 배포가 어렵습니다.
+
+> This this is the original like SSE transport design is basically you deploy an MCP server and then a client can come in and connect.  
+
+원래 **SSE 기반 전송 디자인**은 MCP 서버를 배포하면, 클라이언트가 접속(connect)만 하면 되는 방식이었고요.
+
+> And then basically you should remain connected indefinitely, which is that's like a tall order for anyone operating at scale.  
+
+클라이언트는 **무한 연결(indefinite connection)** 상태를 유지해야 하는데, 대규모 운영 환경에서는 매우 부담스럽습니다.
+
+> It's just like not a deployment or operational model you really want to support it.  
+
+사실상 그 방식을 그대로 지원하기는 어렵죠.
+
+> So we were trying to think, like, how can we balance the belief that statefulness is important with sort of simpler operation and maintenance and stuff like that?  
+
+그래서 “상태 유지의 중요성”과 “운영·유지보수의 단순성” 사이에서 어떻게 균형을 맞출지 고민했습니다.
+
+> And the news sort of we're calling it the streamable HTTP transport that we came up with still has SSE in there.  
+
+결과적으로 저희는 **Streamable HTTP Transport**라는 방식을 제안했는데, 내부적으로는 여전히 SSE를 활용합니다.
+
+> But it has a more like a gradual approach where like a server could be just plain HTTP, like, you know, have one endpoint that you send HTTP posts to and then, you know, get a result back.  
+
+그러면서도 서버를 **순차적(gradual)** 으로 업그레이드할 수 있도록, 우선은 일반 HTTP POST 한 번으로 결과를 받을 수 있는 엔드포인트를 마련했습니다.
+
+> And then you can like gradually enhance it with like, OK, now I want the results to be streaming or like now I want the server to be able to issue its own requests.  
+
+그다음 단계로 “결과를 스트리밍(streaming)으로 받고 싶다”거나 “서버가 클라이언트 요청 없이도 푸시를 하길 원한다” 같은 기능을 순차적으로 추가할 수 있습니다.
+
+> And as long as the server and client both support the ability to like resume sessions, like, you know, to disconnect and come back later and pick up where you left off, then you get kind of the best of both worlds where it could still be this stateful interaction and stateful server, but allows you to like horizontally scale more easily or like deal with spotty network connections or whatever the case may be.  
+
+또한 서버·클라이언트가 **세션 재개(resume sessions)** 를 지원하면, 연결이 끊겼다가 다시 이어도 이전 상태를 복원할 수 있어, 상태 유지와 확장성·불안정 네트워크 대응을 모두 만족시킬 수 있습니다.
+
+---
+### 인증
+
+>And you had, as you mentioned, session ID.  
+
+ 세션 ID를 언급하셨고요.
+
+>How do you think about auth going forward?  
+
+ 앞으로 인증(auth)은 어떻게 설계하실 계획인가요?
+
+>And that will solve a lot of these issues because you don't really want to have people bring API keys, particularly when you have like, when you think about a world, which, which I truly believe will happen where the majority of servers will be remote servers.  
+
+API 키를 그대로 노출하는 것은 위험하기 때문에, 특히 대부분의 서버가 원격 서비스화될 미래를 대비해 OAuth 기반 인증이 더 안전한 해법입니다.
+
+### 오픈소스 제단관련
+
+이후 오픈소스 관련 논의 와 대화를 하면서 끝을 맻는다.
+ 
 공식 발표일은 2024년 11월 25일  
   
   
@@ -489,7 +918,8 @@ MCP?
   
 >"Another version that we've used and gotten to like is like MCP is kind of like the USB-C port of AI applications and that it's meant to be this universal connector to a whole ecosystem of things."  
   
-  
+
+
   
   
 ### 출처  
