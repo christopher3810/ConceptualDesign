@@ -1,4 +1,18 @@
 
+### Mcp?
+
+MCP?  
+  
+>"Model Context Protocol, or MCP for short, is basically something we've designed to help AI applications extend themselves or integrate with an ecosystem of plugins, basically. The terminology is a bit different. We use this client-server terminology, and we can talk about why that is and where that came from. But at the end of the day, it really is that. It's like extending and enhancing the functionality of AI application."  
+
+“MCP(Model Context Protocol, 줄여서 MCP)는 본질적으로 AI 애플리케이션이 스스로 기능을 확장하거나 플러그인 생태계와 통합될 수 있도록 돕기 위해 설계된 프로토콜입니다. 용어는 조금 다르게 쓰이는데, 저희는 이를 ‘클라이언트-서버’라는 용어로 부릅니다. 그 이유와 유래는 따로 설명할 수 있지만, 결국 핵심은 AI 애플리케이션의 기능을 확장하고 강화한다는 점입니다.”
+
+>"Another version that we've used and gotten to like is like MCP is kind of like the USB-C port of AI applications and that it's meant to be this universal connector to a whole ecosystem of things."  
+
+“또 하나 저희가 즐겨 사용하는 비유는 ‘MCP가 마치 AI 애플리케이션의 USB-C 포트’라는 것입니다. 다양한 기기와 호환되는 USB-C처럼, MCP도 여러 도구와 시스템이 연결될 수 있는 **범용 인터페이스**라는 뜻이죠.”
+
+---
+
 ### 시작 배경
   
 > It is actually mostly like us two guys in a room riffing.  
